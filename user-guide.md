@@ -1,7 +1,6 @@
 # HTFL Makerspace Check-In App — User Guide
 
-Welcome! This guide will walk you through everything you need to know about using the HTFL Makerspace Check-In App. No technical knowledge required.
-
+Hi everyone, I made this guide to walk you through most things you need to know about using the HTFL Makerspace Check-In App.
 ---
 
 ## Part 1: How to Use the App
@@ -12,17 +11,19 @@ Open any web browser (Chrome, Safari, Firefox, etc.) and go to:
 
 **https://htfl-makerspace.github.io/checkin-app**
 
-The app works on computers, tablets (like iPads), and phones. For the best check-in experience, we recommend using a tablet placed at the entrance of your space.
+The app works on computers, tablets (like iPads), and phones. We've set up an iPad in the Makerspace as the main device that this app will be used on. The sleep mode has been set to 'Never so that the app will always be open for use during work hours -- just make sure to turn the table on / off at the beginning / end of the shift so the battery doesn't drain overnight.
 
 ### Signing In
 
-When you first open the app, you'll see a sign-in screen. Enter the email address and password that were set up for your makerspace location. Once signed in, the app will remember you — you won't need to sign in again unless you sign out.
+<img width="836" height="652" alt="image" src="https://github.com/user-attachments/assets/2faa8aff-dab0-4b6d-aeda-eabf556421e9" />
+
+When you first open the app, you'll see a sign-in screen. Simply enter the email address and password that we provide. Once signed in, the app will remember you — you won't need to sign in again unless you sign out.
 
 To sign out, click the **Sign out** button in the top-right corner of the screen.
 
 ### The Check-In Page
 
-This is the main screen you'll see after signing in. It's designed to be simple enough that visitors can use it on their own.
+<img width="2880" height="1800" alt="image" src="https://github.com/user-attachments/assets/804b2c8f-d137-42e2-beb8-3726d1b75b05" />
 
 #### How it works
 
@@ -32,19 +33,17 @@ The screen shows three large buttons:
 - **Teen +1** — for visitors aged 12 to 17
 - **Child +1** — for visitors aged 11 or below
 
-When a visitor arrives, they (or a staff member) simply tap the button that matches their age group. That's it — the check-in is recorded instantly.
+When a patron arrives, a staff member simply tap the button that matches their age group. That's it — the check-in is recorded instantly.
 
 #### The Undo feature
 
-Mistakes happen! When someone taps a button, a small notification appears at the bottom of the screen with an **Undo** button. You have **10 seconds** to press Undo if the wrong button was tapped or if the tap was accidental. A small countdown bar shows how much time is left. After 10 seconds, the notification disappears and the check-in is final.
+When someone taps a button, a small notification appears at the bottom of the screen with an **Undo** button. You have **10 seconds** to press Undo if the wrong button was tapped or if the tap was accidental. A small countdown bar shows how much time is left. After 10 seconds, the notification disappears and the check-in is final.
 
-This design was intentional — we wanted the check-in process to be as fast as possible (just one tap), while still giving a safety net for mistakes. There's no confirmation dialog that slows people down.
-
-#### Clock and weather widget
-
-In the top-right corner of the check-in screen, you'll see a small widget showing the current time, date, and temperature. It also has a nice animated background that changes based on the actual weather outside (sunny, cloudy, rainy, snowy, etc.) and whether it's daytime or nighttime.
+This design allows the check-in process to be as fast as possible (just one tap), while still giving a safety net for mistakes.
 
 ### The Dashboard Page
+
+<img width="2880" height="1800" alt="image" src="https://github.com/user-attachments/assets/eb93bd63-161f-4e11-9835-0c17e277f242" />
 
 To switch to the dashboard, use the toggle at the top of the screen that says **Check In** / **Dashboard**. The dashboard shows you a summary of all check-ins over time, displayed as a bar chart and a data table.
 
@@ -71,7 +70,7 @@ There's a checkbox labeled **Color by age group**. When turned on, each bar in t
 
 #### Your preferences are saved
 
-All of your filter choices (granularity, age group, time range, data source, and the color-by-age setting) are automatically saved in your browser. If you close the app and come back later, your dashboard will look exactly the way you left it.
+All of your filter choices (granularity, age group, time range, data source, and the color-by-age setting) are automatically saved in your browser. If you close the app and come back later, your dashboard will look exactly the way you left it. Note that if the browser's cache is ever cleared, the preferences will be lost (and you might have to login again)--but they should be automatically saved the next time you use the app.
 
 ### Dark Mode
 
@@ -81,7 +80,7 @@ Click the moon/sun icon in the top-right corner of the header to switch between 
 
 ## Part 2: How This App Was Made (Behind the Scenes)
 
-This section is for anyone curious about the technology behind the app. We'll keep it simple — no coding knowledge needed!
+This section is for anyone curious about the technology behind the app.
 
 ### The basics
 
@@ -93,15 +92,13 @@ The app is built with a few key technologies:
 
 - **React** — This is a popular tool (created by Facebook) for building interactive websites. It's what makes the buttons, charts, dropdowns, and everything you see on screen work smoothly. When you tap a check-in button, React instantly updates what you see without needing to reload the whole page.
 
-- **shadcn/ui** — This is a collection of pre-designed visual components (buttons, tables, dropdown menus, cards, etc.) that gives the app a clean, modern, and consistent look. Think of it like a set of building blocks for the visual design.
-
-- **Recharts** — This is the tool that draws the bar charts on the dashboard. It takes the check-in numbers and turns them into the visual graphs you see.
+- **shadcn/ui** — This is a collection of pre-designed visual components (buttons, tables, dropdown menus, cards, etc.) that gives the app a clean, modern, and consistent look.
 
 - **Supabase** — This is the app's "backend" — the place where all the data lives. When someone taps a check-in button, that record gets sent to Supabase's database and stored securely in the cloud. Supabase also handles the sign-in system, making sure only authorized users can access the app. Think of Supabase as the app's brain and memory, running on servers somewhere in the cloud so your data is safe even if your tablet breaks.
 
 ### Where does the app live?
 
-The app is hosted for free on **GitHub Pages**, a service provided by GitHub (a widely-used platform where developers store and share code). The app's code is stored in a GitHub repository (like a folder in the cloud), and GitHub Pages automatically turns that code into the website you visit. This means:
+The app is hosted for free on **GitHub Pages**, a service provided by GitHub (a widely-used platform where developers store and share code). The app's code is stored in a GitHub repository, and GitHub Pages automatically turns that code into the website you visit. In fact, this guide you're reading has been included as a part of the codebase, and it's also being hosted on Github itself! This means:
 
 - The app is always available online at its web address
 - It costs nothing to host
@@ -117,8 +114,6 @@ Here's the simple version of what happens when someone checks in:
 4. Later, when you open the dashboard, the app asks Supabase to add up all the check-ins and group them by time period
 5. The results come back and get displayed as the chart and table you see
 
-All of this happens in a fraction of a second.
-
 ### Privacy and security
 
 - The app requires a sign-in, so only authorized makerspace staff can access the check-in screen and dashboard
@@ -128,4 +123,4 @@ All of this happens in a fraction of a second.
 
 ---
 
-*If you have questions or run into any issues with the app, reach out to your makerspace's tech team.*
+*If you have questions or run into any issues with the app, reach out to me at dam@haverfordlibrary.org!*
