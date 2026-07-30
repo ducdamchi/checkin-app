@@ -13,7 +13,7 @@ const router = createBrowserRouter([
       { path: '/dashboard', element: <DashboardPage /> },
     ],
   },
-])
+], { basename: '/checkin-app' })
 
 export function App() {
   return <RouterProvider router={router} />

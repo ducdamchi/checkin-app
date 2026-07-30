@@ -31,7 +31,7 @@ export function AppHeader() {
   return (
     <header className="flex items-center justify-between border-b px-4 py-3">
       <nav className="flex gap-6 items-center">
-        <img src="htfl_logo.png" className="max-w-40" />
+        <img src={`${import.meta.env.BASE_URL}htfl_logo.png`} className="max-w-40" />
         <SlideToggle
           options={[
             { label: "Check In", value: "/" },

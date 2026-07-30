@@ -1,17 +1,10 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
+import { useLocalStorage } from "./useLocalStorage"
 
 type Theme = "light" | "dark"
 
-const STORAGE_KEY = "theme"
-
-function getInitialTheme(): Theme {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored === "light" || stored === "dark") return stored
-  return "light"
-}
-
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const [theme, setTheme] = useLocalStorage<Theme>("theme", "light")
 
   useEffect(() => {
     const root = document.documentElement
@@ -20,7 +13,6 @@ export function useTheme() {
     } else {
       root.classList.remove("dark")
     }
-    localStorage.setItem(STORAGE_KEY, theme)
   }, [theme])
 
   const toggle = () => setTheme((t) => (t === "light" ? "dark" : "light"))

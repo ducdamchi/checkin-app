@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import {
   Select,
@@ -21,6 +20,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "../components/ui/chart"
+import { useLocalStorage } from "../hooks/useLocalStorage"
 import {
   useCheckinStats,
   useCheckinStatsBreakdown,
@@ -84,30 +84,35 @@ const chartConfigBreakdown = {
 
 function formatPeriod(period: string, granularity: Granularity): string {
   const d = new Date(period)
+  // The SQL function already converts to America/New_York, but returns
+  // timestamptz so the values arrive labeled as UTC. Use timeZone: "UTC"
+  // to display them as-is without a second browser timezone conversion.
+  const tz = "UTC" as const
   switch (granularity) {
     case "hour":
       return d.toLocaleString("en-US", {
         month: "short",
         day: "numeric",
         hour: "numeric",
+        timeZone: tz,
       })
     case "day":
-      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: tz })
     case "week":
-      return `Wk ${d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+      return `Wk ${d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: tz })}`
     case "month":
-      return d.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+      return d.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: tz })
     case "year":
-      return d.getFullYear().toString()
+      return d.getUTCFullYear().toString()
   }
 }
 
 export function DashboardPage() {
-  const [granularity, setGranularity] = useState<Granularity>("day")
-  const [ageGroup, setAgeGroup] = useState<AgeGroupFilter>("all")
-  const [rangePreset, setRangePreset] = useState<RangePreset>("30d")
-  const [dataSource, setDataSource] = useState<DataSource>("live")
-  const [colorByAge, setColorByAge] = useState(true)
+  const [granularity, setGranularity] = useLocalStorage<Granularity>("dashboard.granularity", "day")
+  const [ageGroup, setAgeGroup] = useLocalStorage<AgeGroupFilter>("dashboard.ageGroup", "all")
+  const [rangePreset, setRangePreset] = useLocalStorage<RangePreset>("dashboard.rangePreset", "30d")
+  const [dataSource, setDataSource] = useLocalStorage<DataSource>("dashboard.dataSource", "live")
+  const [colorByAge, setColorByAge] = useLocalStorage("dashboard.colorByAge", true)
 
   const { data, isLoading, error } = useCheckinStats(
     granularity,
@@ -148,7 +153,7 @@ export function DashboardPage() {
     : chartData.reduce((sum, row) => sum + row.count, 0)
 
   return (
-      <main className="flex flex-1 flex-col gap-6 p-6">
+      <main className="flex min-w-0 flex-1 flex-col gap-6 p-6 overflow-hidden">
         <div className="flex flex-col gap-6 justify-center">
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-3">
@@ -267,68 +272,72 @@ export function DashboardPage() {
             No check-ins for this period
           </div>
         ) : colorByAge ? (
-          <ChartContainer
-            config={chartConfigBreakdown}
-            className="max-h-80 w-full">
-            <BarChart data={breakdownChartData} accessibilityLayer>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="period"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-              />
-              <YAxis
-                allowDecimals={false}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar
-                dataKey="child"
-                fill="var(--color-child)"
-                stackId="age"
-                radius={[0, 0, 0, 0]}
-              />
-              <Bar
-                dataKey="teen"
-                fill="var(--color-teen)"
-                stackId="age"
-                radius={[0, 0, 0, 0]}
-              />
-              <Bar
-                dataKey="adult"
-                fill="var(--color-adult)"
-                stackId="age"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ChartContainer>
+          <div className="w-full max-w-full overflow-hidden">
+            <ChartContainer
+              config={chartConfigBreakdown}
+              className="max-h-80 w-full">
+              <BarChart data={breakdownChartData} accessibilityLayer>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="period"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey="child"
+                  fill="var(--color-child)"
+                  stackId="age"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  dataKey="teen"
+                  fill="var(--color-teen)"
+                  stackId="age"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  dataKey="adult"
+                  fill="var(--color-adult)"
+                  stackId="age"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ChartContainer>
+          </div>
         ) : (
-          <ChartContainer config={chartConfig} className="max-h-80 w-full">
-            <BarChart data={chartData} accessibilityLayer>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="period"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-              />
-              <YAxis
-                allowDecimals={false}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar
-                dataKey="count"
-                fill="var(--color-count)"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ChartContainer>
+          <div className="w-full max-w-full overflow-hidden">
+            <ChartContainer config={chartConfig} className="max-h-80 w-full">
+              <BarChart data={chartData} accessibilityLayer>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="period"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey="count"
+                  fill="var(--color-count)"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ChartContainer>
+          </div>
         )}
 
         {/* Data table */}
