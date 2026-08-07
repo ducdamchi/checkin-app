@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 
 interface SlideToggleOption {
   label: string
@@ -12,52 +12,49 @@ interface SlideToggleProps {
   className?: string
 }
 
-export function SlideToggle({ options, value, onChange, className = "" }: SlideToggleProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const buttonRefs = useRef<Map<string, HTMLButtonElement>>(new Map())
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
-
-  const updateIndicator = useCallback(() => {
-    const button = buttonRefs.current.get(value)
-    const container = containerRef.current
-    if (!button || !container) return
-    const containerRect = container.getBoundingClientRect()
-    const buttonRect = button.getBoundingClientRect()
-    setIndicatorStyle({
-      left: buttonRect.left - containerRect.left,
-      width: buttonRect.width,
-    })
-  }, [value])
+export function SlideToggle({
+  options,
+  value,
+  onChange,
+  className = "",
+}: SlideToggleProps) {
+  const urlIndex = options.findIndex((o) => o.value === value)
+  const [pendingIndex, setPendingIndex] = useState<number | null>(null)
 
   useEffect(() => {
-    updateIndicator()
-  }, [updateIndicator])
+    if (pendingIndex !== null && pendingIndex === urlIndex)
+      setPendingIndex(null)
+  }, [urlIndex, pendingIndex])
+
+  const activeIndex = pendingIndex ?? urlIndex
+  const count = options.length
 
   return (
-    <div
-      ref={containerRef}
-      className={`relative flex rounded-full bg-muted p-1 ${className}`}
-    >
-      <div
-        className="absolute top-1 bottom-1 rounded-full bg-primary shadow-sm transition-all duration-300 ease-in-out"
-        style={{ left: indicatorStyle.left, width: indicatorStyle.width }}
-      />
-      {options.map((option) => (
-        <button
-          key={option.value}
-          ref={(el) => {
-            if (el) buttonRefs.current.set(option.value, el)
+    <div className={`rounded-full bg-background ${className}`}>
+      <div className="relative grid" style={{ gridTemplateColumns: `repeat(${count}, 1fr)` }}>
+        <div
+          className="absolute -inset-y-0.5 rounded-full bg-primary shadow-sm transition-[left] duration-300 ease-in-out"
+          style={{
+            width: `calc(100% / ${count})`,
+            left: `calc(${activeIndex >= 0 ? activeIndex : 0} * 100% / ${count})`,
           }}
-          className={`relative z-10 rounded-full px-3 py-1 text-center text-sm font-medium transition-colors duration-300 ${
-            value === option.value
-              ? "text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          onClick={() => onChange(option.value)}
-        >
-          {option.label}
-        </button>
-      ))}
+        />
+        {options.map((option, idx) => (
+          <button
+            key={option.value}
+            className={`relative z-10 rounded-full px-3 py-1 text-center text-sm font-medium transition-colors duration-100 ease-in ${
+              activeIndex === idx
+                ? "text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => {
+              setPendingIndex(idx)
+              onChange(option.value)
+            }}>
+            {option.label}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

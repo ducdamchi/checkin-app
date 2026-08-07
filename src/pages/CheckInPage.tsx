@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth"
 import { Button } from "../components/ui/button"
 import { UndoToast } from "../components/UndoToast"
 import { ClockWeatherWidget } from "../components/ClockWeatherWidget"
+import { DaySchedule } from "../components/DaySchedule"
 
 const AGE_GROUPS = [
   { value: "adult", label: "Adult +1", description: "18 or above" },
@@ -61,25 +62,37 @@ export function CheckInPage() {
   })
 
   return (
-    <main className="relative flex flex-1 flex-col items-center justify-center gap-6 p-4">
-      <div className="absolute top-4 right-4">
-        <ClockWeatherWidget />
-      </div>
-      <h1 className="text-3xl font-bold">Tap to check in</h1>
-      <div className="flex w-full gap-4 items-center justify-center">
-        {AGE_GROUPS.map((group) => (
-          <Button
-            key={group.value}
-            size="lg"
-            className="h-40 w-60 text-2xl flex flex-col items-center justify-center"
-            disabled={checkin.isPending}
-            onClick={() => checkin.mutate(group.value)}>
-            <span>{group.label}</span>
-            <span className="text-base font-extralight">
-              {group.description}
-            </span>
-          </Button>
-        ))}
+    <main className="flex flex-1 p-4 h-full">
+      <div className="flex flex-1 h-full gap-6">
+        {/* Check-in buttons */}
+        <div className="flex flex-1 flex-col h-full items-center justify-center gap-6 rounded-2xl border border-border/50 shadow-lg bg-card shadow-md pb-10">
+          <h1 className="text-3xl font-bold">Tap to check in</h1>
+          <div className="flex gap-4">
+            {AGE_GROUPS.map((group) => (
+              <Button
+                key={group.value}
+                size="lg"
+                className="h-40 w-60 text-2xl flex flex-col items-center justify-center"
+                disabled={checkin.isPending}
+                onClick={() => checkin.mutate(group.value)}>
+                <span>{group.label}</span>
+                <span className="text-base font-extralight">
+                  {group.description}
+                </span>
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Weather + Calendar sidebar */}
+        <div className="flex flex-col gap-3 w-72 ">
+          <div className="shrink-0">
+            <ClockWeatherWidget />
+          </div>
+          <div className="flex-1 min-h-0">
+            <DaySchedule />
+          </div>
+        </div>
       </div>
     </main>
   )

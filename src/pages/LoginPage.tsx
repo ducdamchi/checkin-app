@@ -72,7 +72,7 @@ export function LoginPage() {
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={submitting}>
-                {submitting ? "Signing in…" : "Sign in"}
+                {submitting ? "Signing in..." : "Sign in"}
               </Button>
             </form>
           </CardContent>
