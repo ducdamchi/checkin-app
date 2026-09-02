@@ -42,7 +42,7 @@ export function useCheckinStats(
     : getRangeFromPreset(rangePreset)
 
   return useQuery({
-    queryKey: ["checkin-stats", granularity, ageGroup, rangePreset, dataSource, start, end],
+    queryKey: ["checkin-stats", granularity, ageGroup, rangePreset, dataSource, ...(rangePreset === "custom" ? [start, end] : [])],
     queryFn: async () => {
       if (dataSource !== "live") {
         return queryDummyStats(dataSource, granularity, ageGroup, rangePreset)
@@ -72,7 +72,7 @@ export function useCheckinStatsBreakdown(
     : getRangeFromPreset(rangePreset)
 
   return useQuery({
-    queryKey: ["checkin-stats-breakdown", granularity, rangePreset, dataSource, start, end],
+    queryKey: ["checkin-stats-breakdown", granularity, rangePreset, dataSource, ...(rangePreset === "custom" ? [start, end] : [])],
     queryFn: async (): Promise<BreakdownRow[]> => {
       if (dataSource !== "live") {
         return queryDummyStatsBreakdown(dataSource, granularity, rangePreset)
