@@ -4,7 +4,7 @@ import { queryDummyStats, queryDummyStatsBreakdown, type DummyDataset } from "..
 
 export type Granularity = "hour" | "day" | "week" | "month" | "year"
 export type AgeGroupFilter = "all" | "adult" | "teen" | "child"
-export type RangePreset = "today" | "7d" | "30d" | "year" | "all"
+export type RangePreset = "today" | "7d" | "30d" | "year" | "all" | "custom"
 export type DataSource = "live" | DummyDataset
 
 export function getRangeFromPreset(preset: RangePreset): { start: string | null; end: string | null } {
@@ -35,11 +35,14 @@ export function useCheckinStats(
   ageGroup: AgeGroupFilter,
   rangePreset: RangePreset,
   dataSource: DataSource = "live",
+  customRange?: { start: string; end: string },
 ) {
-  const { start, end } = getRangeFromPreset(rangePreset)
+  const { start, end } = rangePreset === "custom" && customRange
+    ? customRange
+    : getRangeFromPreset(rangePreset)
 
   return useQuery({
-    queryKey: ["checkin-stats", granularity, ageGroup, rangePreset, dataSource],
+    queryKey: ["checkin-stats", granularity, ageGroup, rangePreset, dataSource, start, end],
     queryFn: async () => {
       if (dataSource !== "live") {
         return queryDummyStats(dataSource, granularity, ageGroup, rangePreset)
@@ -62,11 +65,14 @@ export function useCheckinStatsBreakdown(
   granularity: Granularity,
   rangePreset: RangePreset,
   dataSource: DataSource = "live",
+  customRange?: { start: string; end: string },
 ) {
-  const { start, end } = getRangeFromPreset(rangePreset)
+  const { start, end } = rangePreset === "custom" && customRange
+    ? customRange
+    : getRangeFromPreset(rangePreset)
 
   return useQuery({
-    queryKey: ["checkin-stats-breakdown", granularity, rangePreset, dataSource],
+    queryKey: ["checkin-stats-breakdown", granularity, rangePreset, dataSource, start, end],
     queryFn: async (): Promise<BreakdownRow[]> => {
       if (dataSource !== "live") {
         return queryDummyStatsBreakdown(dataSource, granularity, rangePreset)

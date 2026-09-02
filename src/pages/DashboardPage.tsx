@@ -51,6 +51,7 @@ const RANGE_PRESETS: { value: RangePreset; label: string }[] = [
   { value: "30d", label: "Last 30 days" },
   { value: "year", label: "This year" },
   { value: "all", label: "All time" },
+  { value: "custom", label: "Custom" },
 ]
 
 const DATA_SOURCES: { value: DataSource; label: string }[] = [
@@ -113,19 +114,29 @@ export function DashboardPage() {
   const [rangePreset, setRangePreset] = useLocalStorage<RangePreset>("dashboard.rangePreset", "30d")
   const [dataSource, setDataSource] = useLocalStorage<DataSource>("dashboard.dataSource", "live")
   const [colorByAge, setColorByAge] = useLocalStorage("dashboard.colorByAge", true)
+  const [customStart, setCustomStart] = useLocalStorage("dashboard.customStart", "")
+  const [customEnd, setCustomEnd] = useLocalStorage("dashboard.customEnd", "")
+
+  const customRange = rangePreset === "custom" && customStart && customEnd
+    ? {
+        start: new Date(customStart).toISOString(),
+        end: new Date(customEnd + "T23:59:59").toISOString(),
+      }
+    : undefined
 
   const { data, isLoading, error } = useCheckinStats(
     granularity,
     ageGroup,
     rangePreset,
     dataSource,
+    customRange,
   )
 
   const {
     data: breakdownData,
     isLoading: breakdownLoading,
     error: breakdownError,
-  } = useCheckinStatsBreakdown(granularity, rangePreset, dataSource)
+  } = useCheckinStatsBreakdown(granularity, rangePreset, dataSource, customRange)
 
   const chartData = (data ?? []).map((row) => ({
     period: formatPeriod(row.period, granularity),
@@ -153,7 +164,7 @@ export function DashboardPage() {
     : chartData.reduce((sum, row) => sum + row.count, 0)
 
   return (
-      <main className="flex min-w-0 flex-1 flex-col gap-6 p-6 overflow-hidden">
+      <main className="flex min-w-0 flex-1 flex-col gap-6 p-6 overflow-auto">
         <div className="flex flex-col gap-6 justify-center">
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-3">
@@ -217,6 +228,33 @@ export function DashboardPage() {
               </Select>
             </div>
 
+            {rangePreset === "custom" && (
+              <>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-light text-muted-foreground">
+                    From
+                  </label>
+                  <input
+                    type="date"
+                    value={customStart}
+                    onChange={(e) => setCustomStart(e.target.value)}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-light text-muted-foreground">
+                    To
+                  </label>
+                  <input
+                    type="date"
+                    value={customEnd}
+                    onChange={(e) => setCustomEnd(e.target.value)}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                  />
+                </div>
+              </>
+            )}
+
             <div className="flex flex-col gap-1">
               <label className="text-xs font-light text-muted-foreground">
                 Data Source
@@ -272,10 +310,10 @@ export function DashboardPage() {
             No check-ins for this period
           </div>
         ) : colorByAge ? (
-          <div className="w-full max-w-full overflow-hidden">
+          <div className="w-full max-w-full">
             <ChartContainer
               config={chartConfigBreakdown}
-              className="max-h-80 w-full">
+              className="min-h-64 max-h-80 w-full">
               <BarChart data={breakdownChartData} accessibilityLayer>
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -313,8 +351,8 @@ export function DashboardPage() {
             </ChartContainer>
           </div>
         ) : (
-          <div className="w-full max-w-full overflow-hidden">
-            <ChartContainer config={chartConfig} className="max-h-80 w-full">
+          <div className="w-full max-w-full">
+            <ChartContainer config={chartConfig} className="min-h-64 max-h-80 w-full">
               <BarChart data={chartData} accessibilityLayer>
                 <CartesianGrid vertical={false} />
                 <XAxis
