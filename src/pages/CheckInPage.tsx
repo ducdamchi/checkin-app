@@ -63,16 +63,16 @@ export function CheckInPage() {
 
   return (
     <main className="flex flex-1 p-4 h-full">
-      <div className="flex flex-1 h-full gap-6">
+      <div className="flex flex-1 h-full gap-3">
         {/* Check-in buttons */}
-        <div className="flex flex-1 flex-col h-full items-center justify-center gap-6 rounded-2xl border border-border/50 shadow-lg bg-card shadow-md pb-10">
+        <div className="flex flex-[3] flex-col h-full items-center justify-center gap-6 rounded-2xl border border-border/50 shadow-lg bg-card shadow-md pb-10 min-w-0">
           <h1 className="text-3xl font-bold">Tap to check in</h1>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             {AGE_GROUPS.map((group) => (
               <Button
                 key={group.value}
                 size="lg"
-                className="h-40 w-60 text-2xl flex flex-col items-center justify-center"
+                className="h-40 w-60 min-w-[150px] flex-shrink text-2xl flex flex-col items-center justify-center"
                 disabled={checkin.isPending}
                 onClick={() => checkin.mutate(group.value)}>
                 <span>{group.label}</span>
@@ -85,7 +85,7 @@ export function CheckInPage() {
         </div>
 
         {/* Weather + Calendar sidebar */}
-        <div className="flex flex-col gap-3 w-72 ">
+        <div className="flex flex-col gap-3 flex-[1] min-w-[300px]">
           <div className="shrink-0">
             <ClockWeatherWidget />
           </div>
