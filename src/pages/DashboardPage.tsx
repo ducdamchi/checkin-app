@@ -310,10 +310,10 @@ export function DashboardPage() {
             No check-ins for this period
           </div>
         ) : colorByAge ? (
-          <div className="w-full max-w-full">
+          <div className="w-full shrink-0">
             <ChartContainer
               config={chartConfigBreakdown}
-              className="min-h-64 max-h-80 w-full">
+              className="h-72 w-full">
               <BarChart data={breakdownChartData} accessibilityLayer>
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -351,7 +351,7 @@ export function DashboardPage() {
             </ChartContainer>
           </div>
         ) : (
-          <div className="w-full max-w-full">
+          <div className="w-full shrink-0">
             <ChartContainer config={chartConfig} className="min-h-64 max-h-80 w-full">
               <BarChart data={chartData} accessibilityLayer>
                 <CartesianGrid vertical={false} />
